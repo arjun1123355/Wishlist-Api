@@ -18,6 +18,7 @@ class GetWishlist
     protected $storeManager;
     protected $userContext;
     protected $objectManager;
+    protected $config;
 
     public function __construct(
         WishlistFactory $wishlistFactory,
@@ -25,7 +26,8 @@ class GetWishlist
         ProductRepositoryInterface $productRepository,
         StoreManagerInterface $storeManager,
         UserContextInterface $userContext,
-        ObjectManagerInterface $objectManager
+        ObjectManagerInterface $objectManager,
+        Config $config
     ) {
         $this->wishlistFactory       = $wishlistFactory;
         $this->itemCollectionFactory = $itemCollectionFactory;
@@ -33,12 +35,18 @@ class GetWishlist
         $this->storeManager          = $storeManager;
         $this->userContext           = $userContext;
         $this->objectManager         = $objectManager;
+        $this->config                = $config;
     }
 
     public function execute(): WishlistResponseInterface
     {
         /** @var WishlistResponseInterface $response */
         $response = $this->objectManager->create(WishlistResponseInterface::class);
+
+        if (!$this->config->isEnabled()) {
+            return $response->setSuccess(false)->setMessage('Wishlist API is disabled')
+                ->setCustomerId(0)->setTotalItems(0)->setItems([]);
+        }
 
         $customerId = $this->userContext->getUserId();
 
