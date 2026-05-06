@@ -2,16 +2,10 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
 
-    <preference for="Codilar\WishList\Api\WishlistManagementInterface"
-                type="Codilar\WishList\Model\WishlistManagement"/>
-
-    <preference for="Codilar\WishList\Api\Data\WishlistItemInterface"
-                type="Codilar\WishList\Model\WishlistManagement"/>
+    <preference for="Codilar\WishList\Api\WishlistApiInterface"
+                type="Codilar\WishList\Model\WishlistService"/>
 
     <preference for="Codilar\WishList\Api\Data\WishlistResponseInterface"
-                type="Codilar\WishList\Model\WishlistManagement"/>
-
-    <preference for="Codilar\WishList\Api\Data\ActionResponseInterface"
-                type="Codilar\WishList\Model\WishlistManagement"/>
+                type="Codilar\WishList\Model\WishlistService"/>
 
 </config>

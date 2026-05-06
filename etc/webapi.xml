@@ -3,35 +3,35 @@
         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
 
     <route url="/V1/wishlist/add" method="POST">
-        <service class="Codilar\WishList\Api\WishlistManagementInterface" method="addToWishlist"/>
+        <service class="Codilar\WishList\Api\WishlistApiInterface" method="addToWishlist"/>
         <resources>
             <resource ref="self"/>
         </resources>
     </route>
 
     <route url="/V1/wishlist/remove" method="POST">
-        <service class="Codilar\WishList\Api\WishlistManagementInterface" method="removeFromWishlist"/>
+        <service class="Codilar\WishList\Api\WishlistApiInterface" method="removeFromWishlist"/>
         <resources>
             <resource ref="self"/>
         </resources>
     </route>
 
     <route url="/V1/wishlist/get" method="GET">
-        <service class="Codilar\WishList\Api\WishlistManagementInterface" method="getWishlist"/>
+        <service class="Codilar\WishList\Api\WishlistApiInterface" method="getWishlist"/>
         <resources>
             <resource ref="self"/>
         </resources>
     </route>
 
     <route url="/V1/wishlist/movetocart" method="POST">
-        <service class="Codilar\WishList\Api\WishlistManagementInterface" method="moveToCart"/>
+        <service class="Codilar\WishList\Api\WishlistApiInterface" method="moveToCart"/>
         <resources>
             <resource ref="self"/>
         </resources>
     </route>
 
     <route url="/V1/wishlist/movetowishlist" method="POST">
-        <service class="Codilar\WishList\Api\WishlistManagementInterface" method="moveToWishlist"/>
+        <service class="Codilar\WishList\Api\WishlistApiInterface" method="moveToWishlist"/>
         <resources>
             <resource ref="self"/>
         </resources>

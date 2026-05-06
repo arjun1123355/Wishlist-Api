@@ -2,102 +2,54 @@
 namespace Codilar\WishList\Model;
 
 use Codilar\WishList\Api\Data\WishlistResponseInterface;
-use Codilar\WishList\Api\Data\WishlistItemInterface;
-use Magento\Wishlist\Model\WishlistFactory;
-use Magento\Wishlist\Model\ResourceModel\Item\CollectionFactory;
-use Magento\Catalog\Api\ProductRepositoryInterface;
-use Magento\Store\Model\StoreManagerInterface;
-use Magento\Authorization\Model\UserContextInterface;
-use Magento\Framework\ObjectManagerInterface;
 
 class GetWishlist
 {
-    protected $wishlistFactory;
-    protected $itemCollectionFactory;
-    protected $productRepository;
-    protected $storeManager;
-    protected $userContext;
-    protected $objectManager;
-    protected $config;
-
     public function __construct(
-        WishlistFactory $wishlistFactory,
-        CollectionFactory $itemCollectionFactory,
-        ProductRepositoryInterface $productRepository,
-        StoreManagerInterface $storeManager,
-        UserContextInterface $userContext,
-        ObjectManagerInterface $objectManager,
-        Config $config
-    ) {
-        $this->wishlistFactory       = $wishlistFactory;
-        $this->itemCollectionFactory = $itemCollectionFactory;
-        $this->productRepository     = $productRepository;
-        $this->storeManager          = $storeManager;
-        $this->userContext           = $userContext;
-        $this->objectManager         = $objectManager;
-        $this->config                = $config;
-    }
+        private readonly WishlistService $service
+    ) {}
 
     public function execute(): WishlistResponseInterface
     {
-        /** @var WishlistResponseInterface $response */
-        $response = $this->objectManager->create(WishlistResponseInterface::class);
-
-        if (!$this->config->isEnabled()) {
-            return $response->setSuccess(false)->setMessage('Wishlist API is disabled')
-                ->setCustomerId(0)->setTotalItems(0)->setItems([]);
-        }
-
-        $customerId = $this->userContext->getUserId();
-
+        $customerId = $this->service->getAuthCustomerId();
         if (!$customerId) {
-            return $response->setSuccess(false)->setMessage('Customer not authenticated')
+            return $this->service->newResponse()
+                ->setSuccess(false)->setMessage('Customer not authenticated')
                 ->setCustomerId(0)->setTotalItems(0)->setItems([]);
         }
-
-        $wishlist = $this->wishlistFactory->create()->loadByCustomerId($customerId, true);
-
+        $wishlist = $this->service->loadWishlist($customerId);
         if (!$wishlist->getId()) {
-            return $response->setSuccess(true)->setMessage('Wishlist is empty')
-                ->setCustomerId((int)$customerId)->setTotalItems(0)->setItems([]);
+            return $this->service->newResponse()
+                ->setSuccess(true)->setMessage('Wishlist is empty')
+                ->setCustomerId($customerId)->setTotalItems(0)->setItems([]);
         }
-
-        $storeIds = [];
-        foreach ($this->storeManager->getStores() as $store) {
-            $storeIds[] = (int)$store->getId();
-        }
-
-        $collection = $this->itemCollectionFactory->create();
-        $collection->addWishlistFilter($wishlist);
-        $collection->addStoreFilter($storeIds);
+        $storeId    = $this->service->getStoreId();
+        $collection = $this->service->itemCollectionFactory->create();
+        $collection->addWishlistFilter($wishlist)
+            ->addStoreFilter($this->service->getStoreIds());
 
         $items = [];
         foreach ($collection as $item) {
-            /** @var WishlistItemInterface $wishlistItem */
-            $wishlistItem = $this->objectManager->create(WishlistItemInterface::class);
-            $wishlistItem->setItemId((int)$item->getId());
-            $wishlistItem->setProductId((int)$item->getProductId());
-            $wishlistItem->setAddedAt((string)$item->getAddedAt());
+            $entry = $this->service->newResponse()
+                ->setItemId((int)$item->getId())
+                ->setProductId((int)$item->getProductId())
+                ->setAddedAt((string)$item->getAddedAt());
 
-            try {
-                $product = $this->productRepository->getById(
-                    $item->getProductId(),
-                    false,
-                    $this->storeManager->getStore()->getId()
-                );
-                $wishlistItem->setName((string)$product->getName());
-                $wishlistItem->setSku((string)$product->getSku());
-                $wishlistItem->setPrice((float)$product->getPrice());
-                $wishlistItem->setFinalPrice((float)$product->getFinalPrice());
-            } catch (\Exception $e) {
-                $wishlistItem->setName('')->setSku('')->setPrice(0.0)->setFinalPrice(0.0);
+            $product = $this->service->getProductById((int)$item->getProductId(), $storeId);
+            if ($product) {
+                $entry->setName((string)$product->getName())
+                    ->setSku((string)$product->getSku())
+                    ->setPrice((float)$product->getPrice())
+                    ->setFinalPrice((float)$product->getFinalPrice());
+            } else {
+                $this->service->logger->warning('GetWishlist: product ' . $item->getProductId() . ' not found');
+                $entry->setName('')->setSku('')->setPrice(0.0)->setFinalPrice(0.0);
             }
-
-            $items[] = $wishlistItem;
+            $items[] = $entry;
         }
-
-        return $response->setSuccess(true)->setMessage('')
-            ->setCustomerId((int)$customerId)
+        return $this->service->newResponse()
+            ->setSuccess(true)->setMessage('Wishlist fetched successfully')
+            ->setCustomerId($customerId)
             ->setTotalItems(count($items))
             ->setItems($items);
     }
