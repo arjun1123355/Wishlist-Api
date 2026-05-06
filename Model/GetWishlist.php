@@ -1,7 +1,7 @@
 <?php
 namespace Codilar\WishList\Model;
 
-use Codilar\WishList\Api\Data\WishlistResponseInterface;
+use Codilar\WishList\Api\WishlistApiInterface;
 
 class GetWishlist
 {
@@ -9,7 +9,7 @@ class GetWishlist
         private readonly WishlistService $service
     ) {}
 
-    public function execute(): WishlistResponseInterface
+    public function execute(): WishlistApiInterface
     {
         $customerId = $this->service->getAuthCustomerId();
         if (!$customerId) {

@@ -5,7 +5,4 @@
     <preference for="Codilar\WishList\Api\WishlistApiInterface"
                 type="Codilar\WishList\Model\WishlistService"/>
 
-    <preference for="Codilar\WishList\Api\Data\WishlistResponseInterface"
-                type="Codilar\WishList\Model\WishlistService"/>
-
 </config>

@@ -1,7 +1,7 @@
 <?php
 namespace Codilar\WishList\Model;
 
-use Codilar\WishList\Api\Data\WishlistResponseInterface;
+use Codilar\WishList\Api\WishlistApiInterface;
 use Magento\Quote\Api\CartRepositoryInterface;
 
 class MoveToWishlist
@@ -11,7 +11,7 @@ class MoveToWishlist
         private readonly CartRepositoryInterface $cartRepository
     ) {}
 
-    public function execute(int $cartItemId): WishlistResponseInterface
+    public function execute(int $cartItemId): WishlistApiInterface
     {
         try {
             $customerId = $this->service->getAuthCustomerId();
