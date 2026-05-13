@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
+
+    <!-- 1. Add Product to Wishlist -->
+    <route url="/V1/wishlist/add" method="POST">
+        <service class="Codilar\WishList\Api\WishlistManagementInterface" method="addProduct"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+    </route>
+
+    <!-- 2. Remove Product from Wishlist -->
+    <route url="/V1/wishlist/remove/:itemId" method="DELETE">
+        <service class="Codilar\WishList\Api\WishlistManagementInterface" method="removeProduct"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+    </route>
+
+    <!-- 3. Get Wishlist Products -->
+    <route url="/V1/wishlist" method="GET">
+        <service class="Codilar\WishList\Api\WishlistManagementInterface" method="getWishlist"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+    </route>
+
+    <!-- 4. Move Product from Wishlist to Cart -->
+    <route url="/V1/wishlist/move-to-cart/:itemId" method="POST">
+        <service class="Codilar\WishList\Api\WishlistManagementInterface" method="moveToCart"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+    </route>
+
+    <!-- 5. Move Product from Cart to Wishlist -->
+    <route url="/V1/wishlist/move-to-wishlist/:itemId" method="POST">
+        <service class="Codilar\WishList\Api\WishlistManagementInterface" method="moveToWishlist"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+    </route>
+
+    <!-- 6. Fetch Wishlist Products (alias, same as GET /wishlist) -->
+    <route url="/V1/wishlist/fetch" method="GET">
+        <service class="Codilar\WishList\Api\WishlistManagementInterface" method="fetchWishlist"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+    </route>
+
+</routes>

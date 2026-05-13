@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <sales>
+            <cart_restriction>
+                <enable>1</enable>
+                <minimum_amount>50</minimum_amount>
+                <error_message>Sorry, products with price less than {{amount}} cannot be added to cart.</error_message>
+            </cart_restriction>
+        </sales>
+    </default>
+</config>
